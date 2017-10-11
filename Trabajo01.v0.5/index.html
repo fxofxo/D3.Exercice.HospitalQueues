@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Hospital Queues Visualization </title>
+</head>
+
+<style>
+
+body {
+  font-family: 'Lato', sans-serif;
+  background-color: ##e7e1ef;
+}
+
+h1 {
+  color: steelblue;
+  margin-top: 40px;
+  font-weight: 300;
+}
+
+
+
+ .label  {
+      fill: steelblue;
+      font: 10px sans-serif;
+  }
+.tick{
+      
+      stroke: steelblue;
+      fill: steelblue;
+  }
+
+ .axis line, .axis path {
+      shape-rendering: crispEdges;
+      stroke: steelblue;
+      fill: none;
+  }
+
+
+
+ .d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(145, 145, 145, 0.7);
+    color: "green";
+    border-radius: 2px;
+  }
+
+  .d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(145, 145, 145, 0.7);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+  }
+
+  .d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+  }
+
+.aCounter, .qCounter{
+    fill: grey;
+    font: 17px sans-serif;
+   
+  }
+}
+
+
+</style>
+
+<body>
+
+	<h1>Hospital <BR>  UnAttended /Attended queues</h1>
+
+	<div id="chart-area"></div>
+
+	<script src="js/d3.v4.min.js"></script>
+	<script src="js/d3-tip.js"></script>
+
+	
+<script>  // create Canvas
+
+// canvas size
+hSize = 300// horizontal
+vSize = 550 // vertical
+hPatients = 8
+vRows = ( 480 / hPatients) >> 0;  //integer division efficient..(stackoverflow )
+ 
+var margin={ top:20,right:20,bottom:20,left:40};
+var w = hSize-margin.right-margin.left
+var h = vSize-margin.top-margin.bottom
+
+
+// tooltip for OnQueue circles.
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>ID:</strong> <span style='color:white'>" + d.name+" " + d.surname + "</span>";
+  })
+
+// tooltip for Attended circles.
+var tip2 = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>ID:</strong> <span style='color:white'>" + this.attributes[2].nodeValue + "</span>";
+  })
+
+
+
+// main svg
+var svg = d3.select("body").append("svg")  
+	.attr("width", w+margin.right+margin.left)
+	.attr("height", h+margin.top+margin.bottom)
+
+
+// Onqueue group
+
+
+var g_onqueue = svg.append("g") 	
+g_onqueue.call(tip)	
+
+
+// Attendeed group
+g_attended = svg.append('g')
+    	.attr('transform', 'translate(' + margin.left + ','+ 0  + ')' )
+	.attr('class', 'attended')
+   		
+
+
+var y_scale = d3.scaleLinear()
+	//.domain([0, d3.max( data, function(d) { return d[1] } ] )
+	.domain([0,vRows])
+	.range([h-20, 0])   // need space for counters
+
+// scale for axis marks.
+var y_scale_hPatients = d3.scaleLinear()
+	.domain([0,vRows*hPatients])
+	.range([h-20, 0])
+	
+
+var myScale = d3.scaleLinear()
+        .domain([0,96])
+        .range([0,h]);
+
+
+//  horizontal axis
+var ticks = [2,10,18,29,37,44];
+var tickLabels = ['0','OnQueue','8','0','Attended','8']
+
+var myAxis = d3.axisBottom()
+  .scale(myScale)
+  .tickValues(ticks)
+  .tickFormat(function(d,i){ return tickLabels[i] });
+    
+
+svg.append("g")
+    .attr('transform', 'translate(' + margin.left + ',' + (vSize -margin.bottom*2  ) + ')' )
+    .attr("class", "x axis")
+    .call(myAxis);
+
+
+//  vertical axis
+var yAxis = d3.axisLeft()
+    .ticks(16)
+    .scale(y_scale_hPatients);
+
+svg.append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top  + ')' )
+    .attr('class', 'y axis')
+      .call(yAxis)
+    .append("text")
+    .attr("class", "label")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 14)
+    .style("text-anchor", "end")
+    .text("N-Patients");
+
+
+
+// Append Counters 
+
+g_counters = svg.append('g')
+    .attr('transform', 'translate(' + (margin.right * 3) + ',' +  (vSize  ) + ')' )
+   
+
+g_counters.append("text")
+   .attr("class", "qCounter")
+   .text("000")
+   .attr("x", 17)
+   .attr("y", 00)
+
+g_counters.append("text")
+   .attr("class", "aCounter")
+   .text("000")
+   .attr("x", 165)
+   .attr("y", 0)
+   
+
+  
+
+
+
+
+
+</script>
+<script src="js/main.js"></script>
+	<script src="js/data-generator.js"></script>
+
+</body>
+</html>
